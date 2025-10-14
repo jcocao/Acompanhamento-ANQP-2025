@@ -1,0 +1,32 @@
+h2#titulo{
+    text-align: left;
+    color: white;
+    height: 100px;
+    position: relative;
+    align-content: center;
+}
+
+.container-fluid {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+body {
+  background:#002a54
+}
+
+card {
+  border-color: #002a54;
+}
+
+.nav-link.active {
+  background-color: #8aa8ff !important;
+}
+
+.nav-item {
+  background-color: white;
+}
+
+.bslib-card, .tab-content, .tab-pane, .card-body {
+  overflow: visible !important;
+}
