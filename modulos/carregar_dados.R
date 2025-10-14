@@ -1,23 +1,22 @@
+box::use(
+  dplyr[`%>%`,
+        as_tibble,
+        mutate,
+        case_when]
+)
 #' @export
-
-brasil <- readRDS("app/data/br_uf_shape.Rds")
-
-#' @export
-
-opcoes <- readRDS("app/data/opcoes.Rds")
-
-#' @export
-
-dados_populacao <- readRDS("app/data/dados_p.rds") %>% 
-  as_tibble()
+brasil <- readRDS("data/br_uf_shape.Rds")
 
 #' @export
+opcoes <- readRDS("data/opcoes.Rds")
 
-hora_da_exportação <- readRDS("app/data/hora.Rds")
+#' @export
+dados_populacao <- readRDS("data/dados_p.rds") %>% 
+  as_tibble() %>%
+  split(.$ead)
 
 #' @export 
-
-dados_primarios <- readRDS("app/data/dados.Rds") %>%
+dados_primarios <- readRDS("data/dados.Rds") %>%
   as_tibble() %>%
   mutate(DR2 = case_when(DR == "AC" ~ "12",
                          DR == "AL" ~ "27",
@@ -46,4 +45,9 @@ dados_primarios <- readRDS("app/data/dados.Rds") %>%
                          DR == "SE" ~ "28",
                          DR == "SP" ~ "35",
                          DR == "TO" ~ "17",
-                         .default = NA_character_))
+                         .default = NA_character_)) %>% 
+  split(.$ead)
+
+
+#' @export
+hora_da_exportacao <- format(Sys.time(), "%d de %B às %H:%M")

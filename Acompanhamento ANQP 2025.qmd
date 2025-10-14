@@ -3,6 +3,7 @@ navbar: false
 format: 
   dashboard:
     scrolling: true
+server: shiny
 theme: [sandstone]
 fig-width: 10
 fig-asp: 0.3
@@ -14,234 +15,114 @@ editor_options:
 ---
 
 ```{r}
-#| label: load-packages
+#| label: definir-tema
 #| message: false
-
-theme_set(theme_minimal(base_size = 24, base_family = "Atkinson Hyperlegible"))
+library(shiny)
+library(bslib)
+library(ggplot2)
+ options(box.path = getwd())
+#theme_set(theme_minimal(base_size = 24, base_family = "Atkinson Hyperlegible"))
 ```
 
 ```{r}
-#| label: load-data
+#| label: carregar-dados
 #| message: false
-
-ld <- read_excel("data/ld.xlsx")
-```
-
-```{r}
-#| label: set-inputs
-
-time_period <- paste(params$month, params$year)
-```
-
-```{r}
-#| label: prep-data
-
-ld <- ld |>
-  mutate(
-    delivery_method = str_to_sentence(delivery_method),
-    term = str_to_sentence(term),
-    parity = case_when(
-      parity == "1"  ~ "Nulliparous",
-      parity == "2"  ~ "Primiparous",
-      parity == "3+" ~ "Multiparous"
-    ),
-    parity = fct_relevel(parity, "Nulliparous", "Primiparous", "Multiparous"),
-    maternal_age = fct_relevel(maternal_age, "<20", "20-34", "35+")
-  )
-```
-
-```{r}
-#| label: all-values
 #| results: hide
 
-n_births <- nrow(ld)
+box::use(
+  modulos/carregar_dados[brasil,
+                         dados_populacao,
+                         hora_da_exportacao]
+)
 
-p_cesarean <- ld |>
-  count(delivery_method) |>
-  mutate(p = n / sum(n)) |>
-  filter(delivery_method == "Cesarean") |>
-  pull(p)
+spam <- 1000
 
-p_cesarean_color <- case_when(
-  between(p_cesarean, params$us_cesarean_rate, params$us_cesarean_rate + params$threshold_diff) ~ "warning",
-  p_cesarean > params$us_cesarean_rate + params$threshold_diff ~ "danger",
-  .default = "light"
-  )
-
-p_preterm <- ld |>
-  count(term) |>
-  mutate(p = n / sum(n)) |>
-  filter(term == "Pre-term") |>
-  pull(p)
-
-p_preterm_color <- case_when(
-  between(p_preterm, params$us_preterm_rate, params$us_preterm_rate + params$threshold_diff) ~ "warning",
-  p_preterm > params$us_preterm_rate + params$threshold_diff ~ "danger",
-  .default = "light"
-  )
 ```
 
-## Row {height="20%"}
 
 ```{r}
-#| content: valuebox
-#| title: "Total births"
+#| label: carregar-visualizacoes
+#| message: false
 
-list(
-  icon = "file-medical",
-  color = "primary",
-  value = n_births
+box::use(
+  modulos/titulo_do_relatorio[cabecalho],
+  modulos/populacao_e_cadastro[saida],
+  modulos/caixas_acessos[caixas_acessos]
 )
 ```
 
-```{r}
-#| content: valuebox
-#| title: "Cesarean deliveries"
 
-list(
-  icon = "clipboard2-pulse",
-  color = p_cesarean_color,
-  value = label_percent(accuracy = 0.1)(p_cesarean)
-)
+## Row {height="10%"}
+```{r}
+
+#| title: "Header"
+cabecalho(params$ano)
+
+selectInput("selecao",
+            "Escolha a modalidade",
+            choices = c("Rede Presencial" = 1,
+                        "Rede EAD" = 2))
+
 ```
 
-```{r}
-#| content: valuebox
-#| title: "Pre-term births"
-
-list(
-  icon = "calendar-week",
-  color = p_preterm_color,
-  value = label_percent(accuracy = 0.1)(p_preterm)
-)
-```
-
-## Row {height="40%"}
-
-### Column {width="40%"}
+## Row {height="10%"}
+::: {.card .cartao title="População e cadastro"}
 
 ```{r}
-#| title: Delivery method
 
-ld |>
-  count(delivery_method) |>
-  mutate(p = n / sum(n)) |>
-  gt() |>
-  fmt_percent(
-    columns = p,
-    decimals = 1
-  ) |>
-  tab_style(
-    style = cell_text(color = "#ae8b2d", weight = "bold"),
-    locations = cells_body(
-      columns = everything(),
-      rows = delivery_method == "Cesarean"
-    )
-  ) |>
-  tab_style(
-    style = cell_text(color = "#0e2635", weight = "bold"),
-    locations = cells_body(
-      columns = everything(),
-      rows = delivery_method == "Vaginal"
-    )
-  ) |>
-  cols_label(
-    delivery_method = "",
-    n = "Number of<br>deliveries",
-    p = "Proportion of<br>deliveries",
-    .fn = md
-  )
+saida
+
 ```
 
-### Column {width="60%"}
-
-```{r}
-#| title: Maternal age
-
-ld |>
-  count(maternal_age) |>
-  mutate(p = n / sum(n)) |>
-  ggplot(aes(x = maternal_age, y = n, group = 1)) +
-  geom_line(linewidth = 2, color = "#0e263560") +
-  geom_point(size = 3, color = "#0e2635") +
-  geom_point(size = 6, color = "#0e2635", shape = "circle open") +
-  labs(x = NULL) +
-  scale_y_continuous(
-    "Count",
-    sec.axis = sec_axis(~ . / n_births, name = "Proportion", labels = label_percent())
-  )
-```
-
-::: {#my-custom-div .highlight .important style="background-color: lightgray; border: 0;"}
-This is content inside a custom div.
-It can include paragraphs, lists, or other markdown elements.
 :::
 
-::: {.card .minhaclasse title="Life Expectancy" padding="3px"}
-This is the content. `r round(params$us_cesarean_rate,1)`
-:::
-
-## Row {height="40%"}
 
 ```{r}
-#| title: Delivery method and parity
+#| context: server
 
-ld |>
-  count(parity, delivery_method) |>
-  ggplot(aes(x = n, y = fct_rev(parity), fill = delivery_method)) +
-  geom_col(position = "fill", color = "white") +
-  scale_fill_manual(
-    values = c("#ae8b2d", "#0e2635"),
-    guide = guide_legend(reverse = TRUE)
-  ) +
-  scale_x_continuous(labels = label_percent()) +
-  labs(y = NULL, x = NULL, fill = "Delivery\nmethod")
+observe({
+  print(input$selecao)
+  }
+)
 ```
+
+
+## Row {height="30%"}
 
 ```{r}
-#| title: Delivery method and maternal age
+#| label: akgyn
 
-ld |>
-  count(maternal_age, delivery_method) |>
-  ggplot(aes(x = n, y = fct_rev(maternal_age), fill = delivery_method)) +
-  geom_col(position = "fill", color = "white") +
-  scale_fill_manual(
-    values = c("#ae8b2d", "#0e2635"),
-    guide = guide_legend(reverse = TRUE)
-  ) +
-  scale_x_continuous(labels = label_percent()) +
-  labs(y = NULL, x = NULL, fill = "Delivery\nmethod")
+card(
+      card_header("Informações do acesso ao questionário",
+                  style = "font-size: 24px;
+                  text-align: center;
+                  background-color: #8aa8ff;
+                  color: white;
+                  "),
+      card_body(style = "background-color: #002a54;
+                         color: white;",
+                layout_columns(
+                  col_widths = c(2, 6, 4),
+                  caixas_acessos,
+                  card(
+                    full_screen = TRUE,
+                    card_body(
+                      "Aqui é um texto"
+                    )
+                  ),
+                  
+                  card(
+                    full_screen = TRUE,
+                    card_body(
+                      "Aqui é um texto2"
+                    )
+                    
+                  )
+                )
+      )
+    )
+
 ```
 
-## Row {height="40%"}
 
-```{r}
-#| title: Delivery method and parity
-
-ld |>
-  count(parity, delivery_method) |>
-  ggplot(aes(x = n, y = fct_rev(parity), fill = delivery_method)) +
-  geom_col(position = "fill", color = "white") +
-  scale_fill_manual(
-    values = c("#ae8b2d", "#0e2635"),
-    guide = guide_legend(reverse = TRUE)
-  ) +
-  scale_x_continuous(labels = label_percent()) +
-  labs(y = NULL, x = NULL, fill = "Delivery\nmethod")
-```
-
-```{r}
-#| title: Delivery method and maternal age
-
-ld |>
-  count(maternal_age, delivery_method) |>
-  ggplot(aes(x = n, y = fct_rev(maternal_age), fill = delivery_method)) +
-  geom_col(position = "fill", color = "white") +
-  scale_fill_manual(
-    values = c("#ae8b2d", "#0e2635"),
-    guide = guide_legend(reverse = TRUE)
-  ) +
-  scale_x_continuous(labels = label_percent()) +
-  labs(y = NULL, x = NULL, fill = "Delivery\nmethod")
-```
 
