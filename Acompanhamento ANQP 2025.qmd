@@ -17,10 +17,17 @@ editor_options:
 ```{r}
 #| label: definir-tema
 #| message: false
+#| context: setup
 library(shiny)
 library(bslib)
-library(ggplot2)
+library(bsicons)
  options(box.path = getwd())
+ 
+ 
+box::use(
+ dplyr[`%>%`,
+       filter] 
+)
 #theme_set(theme_minimal(base_size = 24, base_family = "Atkinson Hyperlegible"))
 ```
 
@@ -28,14 +35,11 @@ library(ggplot2)
 #| label: carregar-dados
 #| message: false
 #| results: hide
+#| context: setup
 
 box::use(
-  modulos/carregar_dados[brasil,
-                         dados_populacao,
-                         hora_da_exportacao]
+  modulos/carregar_dados[...]
 )
-
-spam <- 1000
 
 ```
 
@@ -43,22 +47,26 @@ spam <- 1000
 ```{r}
 #| label: carregar-visualizacoes
 #| message: false
+#| context: setup
 
 box::use(
   modulos/titulo_do_relatorio[cabecalho],
-  modulos/populacao_e_cadastro[saida],
-  modulos/caixas_acessos[caixas_acessos]
+  modulos/populacao_e_cadastro,
+  modulos/caixas_acessos,
+  modulos/grafico_taxa,
+  modulos/tp_aparelho,
+  modulos/mapa,
+  modulos/tabela
 )
 ```
 
 
 ## Row {height="10%"}
 ```{r}
-
-#| title: "Header"
+#| label: "Header"
 cabecalho(params$ano)
 
-selectInput("selecao",
+selectInput("modalidade",
             "Escolha a modalidade",
             choices = c("Rede Presencial" = 1,
                         "Rede EAD" = 2))
@@ -69,28 +77,41 @@ selectInput("selecao",
 ::: {.card .cartao title="População e cadastro"}
 
 ```{r}
-
-saida
+#| label: primeiro-segmento
+populacao_e_cadastro$ui("PrimeiroSegmento")
 
 ```
 
 :::
 
-
 ```{r}
+#| label: processa-dados-primeiro-segmento
 #| context: server
 
-observe({
-  print(input$selecao)
-  }
-)
-```
+populacao_filtrada <- reactive({
+    req(input$modalidade)
+    dados_populacao[[input$modalidade]] %>% 
+      filter(DR == DR_selecionado())
+  })
 
+DR_selecionado <- populacao_e_cadastro$server("PrimeiroSegmento", 
+                                              populacao_filtrada)
+
+
+dados_filtrado <- reactive({
+  req(input$modalidade)
+  req(DR_selecionado())
+  dados_primarios[[input$modalidade]] %>%
+    filter(DR == DR_selecionado())
+})
+
+
+```
 
 ## Row {height="30%"}
 
 ```{r}
-#| label: akgyn
+#| label: segundo-segmento
 
 card(
       card_header("Informações do acesso ao questionário",
@@ -102,25 +123,120 @@ card(
       card_body(style = "background-color: #002a54;
                          color: white;",
                 layout_columns(
-                  col_widths = c(2, 6, 4),
-                  caixas_acessos,
+                  col_widths = c(3, 5, 4),
+                  caixas_acessos$ui("SegundoSegmento-Caixas"),
                   card(
-                    full_screen = TRUE,
                     card_body(
-                      "Aqui é um texto"
+                      grafico_taxa$ui("SegundoSegmento-Acessos")
                     )
                   ),
-                  
+
                   card(
-                    full_screen = TRUE,
                     card_body(
-                      "Aqui é um texto2"
+                        tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
                     )
-                    
+
                   )
                 )
       )
     )
+
+```
+
+
+```{r}
+#| label: processa-dados-segundo-segmento
+#| context: server
+
+caixas_acessos$server("SegundoSegmento-Caixas", 
+                      dados_filtrado)
+grafico_taxa$server("SegundoSegmento-Acessos",
+                    dados_filtrado,
+                    DR_selecionado)
+
+tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
+                    dados_filtrado,
+                    DR_selecionado)
+
+```
+
+## Row {height="30%"}
+
+```{r}
+#| label: terceiro-segmento
+
+card(
+      card_header("Questionários válidos e Taxa de resposta",
+                  style = "font-size: 24px; 
+                 text-align: center;
+                 background-color: #8aa8ff;
+                 color: white;
+                 "),
+      
+      card_body(style = "background-color: #002a54;
+                         color: white;",
+                layout_columns(
+                  col_widths = c(4, 4, 4, 6, 6),
+                  value_box(
+                    title = "População Alvo do Brasil:",
+                    value = "300.000",
+                    showcase = bs_icon("people-fill"),
+                    showcase_layout = "left center",
+                    theme = value_box_theme(fg = "#000",
+                                            bg = "#fff")
+                  ),
+                  value_box(
+                    title = "Questionários válidos do Brasil:",
+                    value = "300.000",
+                    showcase = bs_icon("clipboard-check-fill"),
+                    showcase_layout = "left center",
+                    theme = value_box_theme(fg = "#000",
+                                            bg = "#fff")
+                  ),
+                  value_box(
+                    title = "Taxa de resposta do Brasil:",
+                    value = "300.000",
+                    showcase = bs_icon("percent"),
+                    showcase_layout = "left center",
+                    theme = value_box_theme(fg = "#000",
+                                            bg = "#fff")
+                  ),
+                  card(
+                    card_body(
+                     tabela$ui("TerceiroSegmento-Tabela")
+                    )
+                  ),
+
+                  card(
+                    card_body(
+                      mapa$ui("TerceiroSegmento-Mapa")
+                    )
+
+                  )
+                )
+      )
+    )
+
+```
+
+
+
+```{r}
+#| label: processa-dados-terceiro-segmento
+#| context: server
+
+dados_brasil_filtrado <- reactive({
+  req(input$modalidade)
+  req(DR_selecionado())
+  dados_primarios[[input$modalidade]]
+})
+
+tabela$server("TerceiroSegmento-Tabela", 
+              dados_brasil_filtrado,
+              opcoes)
+mapa$server("TerceiroSegmento-Mapa",
+                    brasil,
+                    dados_brasil_filtrado)
 
 ```
 

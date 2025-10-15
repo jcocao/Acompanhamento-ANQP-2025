@@ -4,6 +4,8 @@ box::use(
         mutate,
         case_when]
 )
+
+
 #' @export
 brasil <- readRDS("data/br_uf_shape.Rds")
 
@@ -15,7 +17,7 @@ dados_populacao <- readRDS("data/dados_p.rds") %>%
   as_tibble() %>%
   split(.$ead)
 
-#' @export 
+#' @export
 dados_primarios <- readRDS("data/dados.Rds") %>%
   as_tibble() %>%
   mutate(DR2 = case_when(DR == "AC" ~ "12",
