@@ -17,7 +17,8 @@ box::use(
 
 box::use(
   modulos/carregar_dados[opcoes],
-  modulos/funcoes_auxiliares[formatar_numero]
+  modulos/funcoes_auxiliares[formatar_numero],
+  modulos/extras[...]
 )
 
 #' @export
@@ -36,21 +37,27 @@ ui <-  function(id) {
       value = textOutput(ns("PopulacaoAlvo")),
       showcase = bs_icon("people-fill"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     ),
     value_box(
       title = "População Alvo com contato",
       value = textOutput(ns("PopulacaoAlvoContato")),
       showcase = bs_icon("person-check-fill"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     ),
     value_box(
       title = "Taxa de cobertura",
       value = textOutput(ns("TaxaCobertura")),
       showcase = bs_icon("percent"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     )
   )
 }

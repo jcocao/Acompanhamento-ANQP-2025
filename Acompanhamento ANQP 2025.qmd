@@ -1,34 +1,26 @@
 ---
-navbar: false
-format: 
-  dashboard:
-    scrolling: true
-server: shiny
-theme: [sandstone]
-fig-width: 10
-fig-asp: 0.3
 params:
   ano: "2025"
-  populacao: 400000
-editor_options: 
-  chunk_output_type: console
+server: shiny
 ---
 
 ```{r}
 #| label: definir-tema
 #| message: false
 #| context: setup
+knitr::opts_knit$set(root.dir = here::here())
+
 library(shiny)
 library(bslib)
 library(bsicons)
- options(box.path = getwd())
- 
- 
+options(box.path = here::here())
+
+
 box::use(
- dplyr[`%>%`,
-       filter] 
+  dplyr[`%>%`,
+        filter] 
 )
-#theme_set(theme_minimal(base_size = 24, base_family = "Atkinson Hyperlegible"))
+
 ```
 
 ```{r}
@@ -55,25 +47,28 @@ box::use(
   modulos/caixas_acessos,
   modulos/grafico_taxa,
   modulos/tp_aparelho,
+  modulos/caixas_populacao_brasil,
   modulos/mapa,
   modulos/tabela
 )
 ```
 
 
-## Row {height="10%"}
+## Row {#cabecalho, height="13%"}
 ```{r}
 #| label: "Header"
-cabecalho(params$ano)
 
-selectInput("modalidade",
-            "Escolha a modalidade",
-            choices = c("Rede Presencial" = 1,
-                        "Rede EAD" = 2))
-
+div(id = "cabecalho",
+    style = "max-height: 240px",
+    cabecalho(params$ano),
+    selectInput("modalidade",
+                "Escolha a modalidade",
+                choices = c("Rede Presencial" = "0",
+                            "Rede EAD" = "1"))
+)
 ```
 
-## Row {height="10%"}
+## Row {height="11%"}
 ::: {.card .cartao title="População e cadastro"}
 
 ```{r}
@@ -89,10 +84,10 @@ populacao_e_cadastro$ui("PrimeiroSegmento")
 #| context: server
 
 populacao_filtrada <- reactive({
-    req(input$modalidade)
-    dados_populacao[[input$modalidade]] %>% 
-      filter(DR == DR_selecionado())
-  })
+  req(input$modalidade)
+  dados_populacao[[input$modalidade]] %>% 
+    filter(DR == DR_selecionado())
+})
 
 DR_selecionado <- populacao_e_cadastro$server("PrimeiroSegmento", 
                                               populacao_filtrada)
@@ -108,38 +103,41 @@ dados_filtrado <- reactive({
 
 ```
 
-## Row {height="30%"}
+## Row {height="32%"}
 
 ```{r}
 #| label: segundo-segmento
 
 card(
-      card_header("Informações do acesso ao questionário",
-                  style = "font-size: 24px;
-                  text-align: center;
-                  background-color: #8aa8ff;
-                  color: white;
-                  "),
-      card_body(style = "background-color: #002a54;
-                         color: white;",
-                layout_columns(
-                  col_widths = c(3, 5, 4),
-                  caixas_acessos$ui("SegundoSegmento-Caixas"),
-                  card(
-                    card_body(
-                      grafico_taxa$ui("SegundoSegmento-Acessos")
-                    )
-                  ),
-
-                  card(
-                    card_body(
-                        tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
-                    )
-
-                  )
-                )
+  card_header("Informações do acesso ao questionário",
+              # style = "font-size: 24px;
+              #     text-align: center;
+              #     background-color: #8aa8ff;
+              #     color: white;
+              #     "
+  ),
+  card_body(
+    # style = "background-color: #002a54;
+    #          color: white;",
+    layout_columns(
+      col_widths = c(3, 5, 4),
+      caixas_acessos$ui("SegundoSegmento-Caixas"),
+      card(
+        max_height = "600px",
+        card_body(
+          grafico_taxa$ui("SegundoSegmento-Acessos")
+        )
+      ),
+      card(
+        max_height = "600px",
+        card_body(
+          tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
+        )
+        
       )
     )
+  )
+)
 
 ```
 
@@ -155,67 +153,49 @@ grafico_taxa$server("SegundoSegmento-Acessos",
                     DR_selecionado)
 
 tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
-                    dados_filtrado,
-                    DR_selecionado)
+                   dados_filtrado,
+                   DR_selecionado)
 
 ```
 
-## Row {height="30%"}
+## Row {height="44%"}
 
 ```{r}
 #| label: terceiro-segmento
 
 card(
-      card_header("Questionários válidos e Taxa de resposta",
-                  style = "font-size: 24px; 
-                 text-align: center;
-                 background-color: #8aa8ff;
-                 color: white;
-                 "),
-      
-      card_body(style = "background-color: #002a54;
-                         color: white;",
-                layout_columns(
-                  col_widths = c(4, 4, 4, 6, 6),
-                  value_box(
-                    title = "População Alvo do Brasil:",
-                    value = "300.000",
-                    showcase = bs_icon("people-fill"),
-                    showcase_layout = "left center",
-                    theme = value_box_theme(fg = "#000",
-                                            bg = "#fff")
-                  ),
-                  value_box(
-                    title = "Questionários válidos do Brasil:",
-                    value = "300.000",
-                    showcase = bs_icon("clipboard-check-fill"),
-                    showcase_layout = "left center",
-                    theme = value_box_theme(fg = "#000",
-                                            bg = "#fff")
-                  ),
-                  value_box(
-                    title = "Taxa de resposta do Brasil:",
-                    value = "300.000",
-                    showcase = bs_icon("percent"),
-                    showcase_layout = "left center",
-                    theme = value_box_theme(fg = "#000",
-                                            bg = "#fff")
-                  ),
-                  card(
-                    card_body(
-                     tabela$ui("TerceiroSegmento-Tabela")
-                    )
-                  ),
-
-                  card(
-                    card_body(
-                      mapa$ui("TerceiroSegmento-Mapa")
-                    )
-
-                  )
+  card_header("Questionários válidos e Taxa de resposta",
+              # style = "font-size: 24px; 
+              #    text-align: center;
+              #    background-color: #8aa8ff;
+              #    color: white;
+              #    "
+              ),
+  
+  card_body(
+  # style = "background-color: #002a54;
+  #                        color: white;",
+            layout_columns(
+              col_widths = c(4, 4, 4, 6, 6),
+              !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas")
+              ,
+              card(
+                card_body(
+                  max_height = "750px",
+                  tabela$ui("TerceiroSegmento-Tabela")
                 )
-      )
-    )
+              ),
+              
+              card(
+                card_body(
+                  max_height = "750px",
+                  mapa$ui("TerceiroSegmento-Mapa")
+                )
+                
+              )
+            )
+  )
+)
 
 ```
 
@@ -231,12 +211,22 @@ dados_brasil_filtrado <- reactive({
   dados_primarios[[input$modalidade]]
 })
 
+populacao_brasil_filtrado <- reactive({
+  req(input$modalidade)
+  req(DR_selecionado())
+  dados_populacao[[input$modalidade]]
+})
+
+caixas_populacao_brasil$server("TerceiroSegmento-Caixas", 
+                               dados_brasil_filtrado,
+                               populacao_brasil_filtrado)
+
 tabela$server("TerceiroSegmento-Tabela", 
               dados_brasil_filtrado,
               opcoes)
 mapa$server("TerceiroSegmento-Mapa",
-                    brasil,
-                    dados_brasil_filtrado)
+            brasil,
+            dados_brasil_filtrado)
 
 ```
 

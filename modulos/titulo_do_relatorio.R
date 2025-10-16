@@ -4,9 +4,7 @@ box::use(
 
 
 box::use(
-  modulos/carregar_dados[brasil,
-                 dados_populacao,
-                 hora_da_exportacao]
+  modulos/carregar_dados[hora_da_exportacao]
 )
 
 #' @export

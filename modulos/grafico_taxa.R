@@ -18,7 +18,8 @@ box::use(
 ui <- function(id) {
   ns <- NS(id)
   
-  echarts4rOutput(outputId = ns("chart_tempo_1"))
+  echarts4rOutput(outputId = ns("chart_tempo_1"),
+                  height = "100%")
   
     
   

@@ -12,7 +12,8 @@ box::use(
 ui <- function(id) {
   ns <- NS(id)
 
-      echarts4rOutput(outputId = ns("grafico_dr_1"))
+      echarts4rOutput(outputId = ns("grafico_dr_1"), 
+                      height = "100%")
       
 }
 

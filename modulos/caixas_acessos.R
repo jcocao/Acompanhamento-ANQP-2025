@@ -10,7 +10,8 @@ box::use(
 
 box::use(
   modulos/funcoes_auxiliares[formatar_numero,
-                             calcular_estatistica_coluna]
+                             calcular_estatistica_coluna],
+  modulos/extras[...]
 )
 
 #' @export
@@ -24,25 +25,34 @@ ui <- function(id) {
     value_box(
       title = "Total de Acessos:",
       value = textOutput(ns("TotalAcessos")),
-      showcase = bs_icon("people-fill"),
+      showcase = bs_icon("people-fill",
+                         size="0.5em"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     ),
     #tempo_medio_de_resposta =
     value_box(
       title = "Tempo médio de resposta:",
       value = textOutput(ns("TempoMedio")),
-      showcase = bs_icon("clipboard-check-fill"),
+      showcase = bs_icon("clipboard-check-fill",
+                         size="0.5em"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     ),
     #tempo_mediano_de_resposta = 
     value_box(
       title = "Tempo mediano de resposta:",
       value = textOutput(ns("TempoMediano")),
-      showcase = bs_icon("percent"),
+      showcase = bs_icon("percent",
+                         size="0.5em"),
       showcase_layout = "left center",
-      max_height = "150px"
+      max_height = "150px",
+      full_screen = FALSE,
+      theme = tema_caixa_de_valor
     )
   )
 }
