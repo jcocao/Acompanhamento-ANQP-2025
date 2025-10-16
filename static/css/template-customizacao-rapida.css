@@ -1,0 +1,392 @@
+/* ============================================
+   TEMPLATE DE CUSTOMIZAÇÃO RÁPIDA
+   Copie as seções que deseja customizar
+   ============================================ */
+
+/* ============================================
+   OPÇÃO 1: PALETA AZUL PROFISSIONAL (Padrão Atual)
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-primary: #8aa8ff;
+  --bs-secondary: #002a54;
+  --cor-header: #8aa8ff;
+  --cor-body: #002a54;
+  --cor-texto-claro: #ffffff;
+}
+*/
+
+/* ============================================
+   OPÇÃO 2: PALETA VERDE INSTITUCIONAL
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-primary: #2ecc71;
+  --bs-secondary: #27ae60;
+  --cor-header: #2ecc71;
+  --cor-body: #27ae60;
+  --cor-texto-claro: #ffffff;
+  
+  --bs-success: #2ecc71;
+  --bs-info: #3498db;
+}
+
+.card-header {
+  background-color: var(--cor-header);
+  color: var(--cor-texto-claro);
+}
+
+.card-body {
+  background-color: var(--cor-body);
+  color: var(--cor-texto-claro);
+}
+*/
+
+/* ============================================
+   OPÇÃO 3: PALETA ROXO MODERNO
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-primary: #9b59b6;
+  --bs-secondary: #8e44ad;
+  --cor-header: #9b59b6;
+  --cor-body: #8e44ad;
+  --cor-texto-claro: #ffffff;
+}
+
+.card-header {
+  background-color: var(--cor-header);
+  color: var(--cor-texto-claro);
+}
+
+.card-body {
+  background-color: var(--cor-body);
+  color: var(--cor-texto-claro);
+}
+*/
+
+/* ============================================
+   OPÇÃO 4: TEMA CLARO (Fundo Branco)
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-primary: #8aa8ff;
+  --bs-secondary: #6c757d;
+  --cor-header: #8aa8ff;
+  --cor-body: #ffffff;
+  --cor-texto-claro: #000000;
+}
+
+.card-header {
+  background-color: var(--cor-header);
+  color: white;
+  border-bottom: 2px solid var(--bs-primary);
+}
+
+.card-body {
+  background-color: var(--cor-body);
+  color: var(--cor-texto-claro);
+  border: 1px solid #dee2e6;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+*/
+
+/* ============================================
+   OPÇÃO 5: AUMENTAR TAMANHO DAS FONTES
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-body-font-size: 1.125rem;    /* 18px ao invés de 16px */
+  --bs-h1-font-size: 3rem;          /* 48px */
+  --bs-h2-font-size: 2.5rem;        /* 40px */
+  --bs-h3-font-size: 2rem;          /* 32px */
+  --bs-h4-font-size: 1.75rem;       /* 28px */
+}
+
+.card-header {
+  font-size: 28px;                  /* Aumenta de 24px para 28px */
+}
+
+.bslib-value-box .value-box-value {
+  font-size: 2.5rem;                /* Aumenta valores das caixas */
+}
+*/
+
+/* ============================================
+   OPÇÃO 6: BORDAS MAIS ARREDONDADAS
+   Descomente para usar
+   ============================================ */
+
+/*
+:root {
+  --bs-card-border-radius: 1rem;    /* 16px */
+  --bs-btn-border-radius: 1rem;     /* 16px */
+  --bs-input-border-radius: 0.75rem; /* 12px */
+}
+
+.bslib-value-box {
+  border-radius: 1rem;
+}
+
+.card {
+  border-radius: 1rem;
+  overflow: hidden;                 /* Garante que conteúdo respeite border-radius */
+}
+*/
+
+/* ============================================
+   OPÇÃO 7: SOMBRAS MAIS PRONUNCIADAS
+   Descomente para usar
+   ============================================ */
+
+/*
+.card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.bslib-value-box {
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.bslib-value-box:hover {
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+  transform: translateY(-5px);
+}
+
+.card:hover {
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+*/
+
+/* ============================================
+   OPÇÃO 8: GRADIENTES NOS CABEÇALHOS
+   Descomente para usar
+   ============================================ */
+
+/*
+.card-header {
+  background: linear-gradient(135deg, #8aa8ff 0%, #6688dd 100%);
+  color: white;
+}
+
+.bslib-value-box {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+*/
+
+/* ============================================
+   OPÇÃO 9: ANIMAÇÕES SUAVES
+   Descomente para usar
+   ============================================ */
+
+/*
+.card,
+.bslib-value-box,
+.btn {
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bslib-value-box:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+*/
+
+/* ============================================
+   OPÇÃO 10: ESTILO MINIMALISTA
+   Descomente para usar
+   ============================================ */
+
+/*
+.card {
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 3px solid var(--bs-primary);
+}
+
+.card-header {
+  background-color: transparent;
+  color: var(--bs-primary);
+  border-bottom: 2px solid var(--bs-primary);
+  text-align: left;
+  padding-left: 0;
+}
+
+.card-body {
+  background-color: white;
+  color: #333;
+  padding-left: 0;
+}
+
+.bslib-value-box {
+  border: none;
+  border-left: 4px solid var(--bs-primary);
+  border-radius: 0;
+  box-shadow: none;
+}
+*/
+
+/* ============================================
+   OPÇÃO 11: CABEÇALHOS COM ÍCONES DESTACADOS
+   Descomente para usar
+   ============================================ */
+
+/*
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.bslib-value-box .value-box-showcase {
+  font-size: 4rem;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+*/
+
+/* ============================================
+   OPÇÃO 12: VALUE BOXES COM CORES DIFERENTES
+   Descomente para usar
+   ============================================ */
+
+/*
+.bslib-value-box:nth-child(1) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.bslib-value-box:nth-child(2) {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.bslib-value-box:nth-child(3) {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+.bslib-value-box .value-box-title,
+.bslib-value-box .value-box-value {
+  color: white;
+}
+*/
+
+/* ============================================
+   OPÇÃO 13: TABELAS ESTILIZADAS
+   Descomente para usar
+   ============================================ */
+
+/*
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table thead th {
+  background-color: var(--bs-primary);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: none;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(138, 168, 255, 0.1);
+}
+
+.table tbody td {
+  border-color: #e9ecef;
+}
+*/
+
+/* ============================================
+   OPÇÃO 14: INPUTS MODERNOS
+   Descomente para usar
+   ============================================ */
+
+/*
+.form-select,
+.form-control {
+  border: 2px solid #e9ecef;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.25rem rgba(138, 168, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+label {
+  font-weight: 600;
+  color: var(--bs-secondary);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+*/
+
+/* ============================================
+   OPÇÃO 15: SCROLLBAR CUSTOMIZADA (Somente Chrome/Edge)
+   Descomente para usar
+   ============================================ */
+
+/*
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: linear-gradient(to bottom, #f1f1f1, #e0e0e0);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--bs-primary), var(--bs-secondary));
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bs-primary);
+}
+*/
+
+/* ============================================
+   SUA CUSTOMIZAÇÃO PERSONALIZADA
+   Use este espaço para suas próprias modificações
+   ============================================ */
+
+/* Cole suas customizações aqui: */
+

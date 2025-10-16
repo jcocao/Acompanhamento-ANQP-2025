@@ -1,5 +1,10 @@
 project:
   title: "Acompanhamento ANQP 2025"
-
+include-in-header: custom-theme.css
+navbar: false
+format: 
+  dashboard:
+    scrolling: true
+    lang: pt-br
 
 
