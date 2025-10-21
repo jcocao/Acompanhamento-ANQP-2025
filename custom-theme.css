@@ -1,13 +1,48 @@
-<style>
- #cabecalho {
-      background-image: url("static/images/header.svg");
-      background-size: cover; /* Adjust as needed: cover, contain, auto */
-      background-repeat: no-repeat; /* Prevent image repetition */
-      background-position: center; /* Center the image */
-    }
+<style title="custom.css">
+#cabecalho {
+  min-height: 80px;
+  flex-direction: row;
+  gap: 15%;
+  justify-content: flex-start;
+  display: flex;
+}
+
+.page-layout-custom {
+  padding: 0 !important;
+}
+
+
+.page-layout-custom > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) {
+padding: 0;
+}
+
+.selectize-dropdown,
+.selectize-input,
+.selectize-input input {
+  line-height:1.5;
+}
+
+.navbar {
+  display: none;
+}
+
 :root {
   --bs-body-bg: #FAFAFF;
   
+}
+
+
+.bslib-grid-item.html-fill-item.bslib-grid{
+  grid-template-rows: unset !important;;
+}
+
+.quarto-dashboard .card .card-body {
+  z-index: 0;
+}
+
+
+.bslib-card, .tab-content, .tab-pane, .card-body {
+  overflow: visible !important;
 }
 
 h1#titulo{
@@ -17,10 +52,22 @@ h1#titulo{
     align-content: center;
 }
 
+
+#grafico-taxa-resposta, 
+#tipo-de-aparelho,
+#tabela-terceiro-segmento,
+#mapa-terceiro-segmento {
+  border: 1px solid #888;
+}
+
 .card {  
   --bs-card-cap-bg: #27EAA6;
   --bs-card-bg: #FAFAFF;
   border: 0;  
+}
+
+.card-body {
+  overflow: hidden;
 }
 
 .card .card-header{
@@ -62,4 +109,5 @@ h1#titulo{
   font-size: 3rem;                 /* Tamanho do ícone (48px) */
   opacity: 0.8;                    /* Opacidade do ícone */
 }
+
 </style>
