@@ -8,6 +8,7 @@ server: shiny
 #| label: definir-tema
 #| message: false
 #| context: setup
+
 knitr::opts_knit$set(root.dir = here::here())
 
 library(shiny)
@@ -51,24 +52,48 @@ box::use(
   modulos/mapa,
   modulos/tabela
 )
+
+
 ```
 
 
-## Row {#cabecalho, height="13%"}
+## Row {height="9%"}
+
 ```{r}
-#| label: "Header"
+#| label: "Titulo do Relatorio"
+```
+![](images/header.svg){width="100%"}
+
+
+## Row {height="5%"}
+```{r}
+#| label: "Seleções do aplicativo"
 
 div(id = "cabecalho",
-    style = "max-height: 240px",
-    cabecalho(params$ano),
-    selectInput("modalidade",
-                "Escolha a modalidade",
+    selectizeInput("modalidade",
+                "Modalidade",
                 choices = c("Rede Presencial" = "0",
-                            "Rede EAD" = "1"))
+                            "Rede EAD" = "1"),
+                options = list(dropdownParent = 'body')),
+    selectizeInput(
+      inputId = "DR",
+      label = "Departamento Regional",
+      choices = opcoes,
+      options = list(dropdownParent = 'body')
+    ),
+    conditionalPanel(
+  condition = "input.DR != 'Brasil'",
+  selectizeInput(
+    inputId = "unidade",
+    label = "Unidade",
+    choices = "A",
+    options = list(dropdownParent = 'body')
+  )
+)
 )
 ```
 
-## Row {height="11%"}
+## Row {height="10%"}
 ::: {.card .cartao title="População e cadastro"}
 
 ```{r}
@@ -83,22 +108,38 @@ populacao_e_cadastro$ui("PrimeiroSegmento")
 #| label: processa-dados-primeiro-segmento
 #| context: server
 
+DR_selecionado <- reactive({
+  req(input$DR)
+  input$DR
+})
+
 populacao_filtrada <- reactive({
   req(input$modalidade)
   dados_populacao[[input$modalidade]] %>% 
+dplyr::add_row(ead = unique(.$ead),
+               DR = "BR",
+               pop_a = sum(.$pop_a),
+               pop_p = sum(.$pop_p),
+               tx = sum(.$pop_p) / sum(.$pop_a)) %>% 
     filter(DR == DR_selecionado())
 })
 
-DR_selecionado <- populacao_e_cadastro$server("PrimeiroSegmento", 
-                                              populacao_filtrada)
+populacao_e_cadastro$server("PrimeiroSegmento", 
+                             populacao_filtrada)
 
 
 dados_filtrado <- reactive({
   req(input$modalidade)
   req(DR_selecionado())
-  dados_primarios[[input$modalidade]] %>%
-    filter(DR == DR_selecionado())
+  saida <- dados_primarios[[input$modalidade]]
+
+if(DR_selecionado() == "BR"){
+saida %>% filter(DR == DR_selecionado())}
+
+saida
 })
+
+
 
 
 ```
@@ -109,20 +150,12 @@ dados_filtrado <- reactive({
 #| label: segundo-segmento
 
 card(
-  card_header("Informações do acesso ao questionário",
-              # style = "font-size: 24px;
-              #     text-align: center;
-              #     background-color: #8aa8ff;
-              #     color: white;
-              #     "
-  ),
+  card_header("Informações do acesso ao questionário"),
   card_body(
-    # style = "background-color: #002a54;
-    #          color: white;",
     layout_columns(
       col_widths = c(3, 5, 4),
       caixas_acessos$ui("SegundoSegmento-Caixas"),
-      card(
+      card(id = "grafico-taxa-resposta",
         max_height = "600px",
         card_body(
           grafico_taxa$ui("SegundoSegmento-Acessos")
@@ -130,7 +163,7 @@ card(
       ),
       card(
         max_height = "600px",
-        card_body(
+        card_body(id = "tipo-de-aparelho",
           tp_aparelho$ui("SegundoSegmento-TipoDeAparelho")
         )
         
@@ -165,30 +198,22 @@ tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
 
 card(
   card_header("Questionários válidos e Taxa de resposta",
-              # style = "font-size: 24px; 
-              #    text-align: center;
-              #    background-color: #8aa8ff;
-              #    color: white;
-              #    "
               ),
   
-  card_body(
-  # style = "background-color: #002a54;
-  #                        color: white;",
-            layout_columns(
+  card_body(layout_columns(
               col_widths = c(4, 4, 4, 6, 6),
               !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas")
               ,
-              card(
+              card(id = "tabela-terceiro-segmento",
                 card_body(
-                  max_height = "750px",
+                  min_height = "750px",
                   tabela$ui("TerceiroSegmento-Tabela")
                 )
               ),
               
-              card(
+              card(id = "mapa-terceiro-segmento",
                 card_body(
-                  max_height = "750px",
+                  min_height = "750px",
                   mapa$ui("TerceiroSegmento-Mapa")
                 )
                 
