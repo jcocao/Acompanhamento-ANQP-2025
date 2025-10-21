@@ -67,7 +67,7 @@ server <- function(id, dados, filtro = "AC") {
         maximumFractionDigits:0});
         return fmt.format(value);
       }')) %>%
-        e_theme_custom('{"color":["#002a54"]}') %>%
+        e_theme_custom('{"color":["#8F93FF"]}') %>%
         e_y_axis(formatter = JS('function(value) {
         var fmt = new Intl.NumberFormat("pt-BR",
         {style:"decimal",
@@ -83,7 +83,7 @@ server <- function(id, dados, filtro = "AC") {
                 subtextStyle = list(fontSize = 14,
                                  fontStyle = "italic")) %>% 
         e_show_loading(text = "Carregando",
-                       color = "#8aa8ff",
+                       color = "#8F93FF",
                        text_color = "#000",
                        mask_color = "rgba(255, 255, 255, 1)")
       }
@@ -104,7 +104,7 @@ server <- function(id, dados, filtro = "AC") {
           e_x_axis(show = FALSE) %>%
           e_y_axis(show = FALSE) %>% 
           e_show_loading(text = "Carregando",
-                         color = "#8aa8ff",
+                         color = "#8F93FF",
                          text_color = "#000",
                          mask_color = "rgba(255, 255, 255, 1)")
       }

@@ -5,7 +5,8 @@ box::use(
   dplyr[filter, mutate, count, left_join, select, pull, summarise, n],
   sf[...],
   purrr[map2],
-  tidyr[replace_na]
+  tidyr[replace_na],
+  grDevices[colorRampPalette]
 )
 
 
@@ -30,6 +31,8 @@ server <- function(id, brasil, dados) {
   moduleServer(id, function(input, output, session) {
     
     output$Brasil <- renderLeaflet({
+      
+      paleta_de_cores <- colorRampPalette(c("#FAFAFF", "#8f93ff"))(5)
       
       dados <- filter(dados(), !is.na(valido))
       faixas <- c(0, 0.75, 0.9, 1.1, 1.25, 10)
@@ -77,7 +80,7 @@ server <- function(id, brasil, dados) {
         }))
       
       cores <- colorFactor(
-        c("#D7E8F0", "#B0C8F7", "#8AA8FF", "#4569A9", "#002A54"),
+        paleta_de_cores,
         domain = brasil$Tx,
         levels = levels(brasil$Tx),
         na.color = "white"
@@ -106,8 +109,8 @@ server <- function(id, brasil, dados) {
           ),
           highlightOptions = highlightOptions(
             stroke = TRUE,
-            color = "#FFF",
-            weight = 1.5,
+            color = "#000000",
+            weight = 1,
             opacity = 1,
             bringToFront = TRUE
           )
