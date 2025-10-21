@@ -4,7 +4,7 @@ box::use(
   bsicons[bs_icon],
   shiny[NS,
         moduleServer,
-        selectInput,
+        selectizeInput,
         textOutput,
         renderText,
         reactive,
@@ -27,15 +27,11 @@ ui <-  function(id) {
   
   layout_column_wrap(
     width = "300px",
-    selectInput(
-      inputId = ns("DR"),
-      label = "Escolha o Departamento Regional",
-      choices = opcoes
-    ),
     value_box(
       title = "População Alvo:",
       value = textOutput(ns("PopulacaoAlvo")),
-      showcase = bs_icon("people-fill"),
+      showcase = bs_icon("people-fill",
+                         size="0.6em"),
       showcase_layout = "left center",
       max_height = "150px",
       full_screen = FALSE,
@@ -44,7 +40,8 @@ ui <-  function(id) {
     value_box(
       title = "População Alvo com contato",
       value = textOutput(ns("PopulacaoAlvoContato")),
-      showcase = bs_icon("person-check-fill"),
+      showcase = bs_icon("person-check-fill",
+                         size="0.6em"),
       showcase_layout = "left center",
       max_height = "150px",
       full_screen = FALSE,
@@ -53,7 +50,8 @@ ui <-  function(id) {
     value_box(
       title = "Taxa de cobertura",
       value = textOutput(ns("TaxaCobertura")),
-      showcase = bs_icon("percent"),
+      showcase = bs_icon("percent",
+                         size="0.6em"),
       showcase_layout = "left center",
       max_height = "150px",
       full_screen = FALSE,
@@ -96,7 +94,6 @@ server <- function(id, populacao_filtrada) {
                                      ndigitos = 1)
     })
     
-    # Retorna DR selecionado como reativo para uso externo
     return(reactive(input$DR))
   })
 }

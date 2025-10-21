@@ -21,35 +21,32 @@ ui <- function(id) {
   
   layout_column_wrap(
     width = 1,
-    #total_acessos = 
     value_box(
       title = "Total de Acessos:",
       value = textOutput(ns("TotalAcessos")),
-      showcase = bs_icon("people-fill",
-                         size="0.5em"),
-      showcase_layout = "left center",
+      showcase = bs_icon("clipboard-data",
+                         size="0.6em"),
+      showcase_layout = "top right",
       max_height = "150px",
       full_screen = FALSE,
       theme = tema_caixa_de_valor
     ),
-    #tempo_medio_de_resposta =
     value_box(
       title = "Tempo médio de resposta:",
       value = textOutput(ns("TempoMedio")),
-      showcase = bs_icon("clipboard-check-fill",
-                         size="0.5em"),
-      showcase_layout = "left center",
+      showcase = bs_icon("stopwatch-fill",
+                         size="0.6em"),
+      showcase_layout = "top right",
       max_height = "150px",
       full_screen = FALSE,
       theme = tema_caixa_de_valor
     ),
-    #tempo_mediano_de_resposta = 
     value_box(
       title = "Tempo mediano de resposta:",
       value = textOutput(ns("TempoMediano")),
-      showcase = bs_icon("percent",
-                         size="0.5em"),
-      showcase_layout = "left center",
+      showcase = bs_icon("stopwatch",
+                         size="0.6em"),
+      showcase_layout = "top right",
       max_height = "150px",
       full_screen = FALSE,
       theme = tema_caixa_de_valor
