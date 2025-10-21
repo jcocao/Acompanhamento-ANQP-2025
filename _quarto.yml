@@ -6,5 +6,6 @@ format:
   dashboard:
     scrolling: true
     lang: pt-br
+    expandable: false
 
 

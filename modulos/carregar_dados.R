@@ -10,7 +10,7 @@ box::use(
 brasil <- readRDS("data/br_uf_shape.Rds")
 
 #' @export
-opcoes <- readRDS("data/opcoes.Rds")
+opcoes <- readRDS("data/opcoes.Rds") %>% c("Brasil" = "BR", .)
 
 #' @export
 dados_populacao <- readRDS("data/dados_p.rds") %>% 
