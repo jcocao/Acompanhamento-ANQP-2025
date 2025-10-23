@@ -123,7 +123,7 @@ opcoes_new <- opcoes[-6]
     updateSelectizeInput(
       session,
       "DR",
-      label = "Departamento Regional - Polo",
+      label = "Departamento Regional - Pólo",
       choices = opcoes_new
     )
   }
