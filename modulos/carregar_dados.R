@@ -94,7 +94,10 @@ dados_primarios <- readRDS("data/dados.Rds") %>%
                          DR == "SE" ~ "28",
                          DR == "SP" ~ "35",
                          DR == "TO" ~ "17",
-                         .default = NA_character_)) %>% 
+                         .default = NA_character_),
+         cod.unidade = paste(DR,
+                             cod.unidade,
+                             sep = "-")) %>% 
   split(.$ead)
 
 

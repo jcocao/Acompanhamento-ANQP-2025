@@ -39,6 +39,11 @@ server <- function(id, dados, opcoes, DR_selecionado) {
         summarise(Validos = sum(valido == "1"),
                   Total = unique(Total),
                   Taxa = (Validos/Total))
+      
+      dr_nome_selecionado <- trad %>% 
+        filter(DR == DR_selecionado()) %>% 
+        pull(Nomes) %>% 
+        as.character()
      
                   
       
@@ -49,6 +54,13 @@ server <- function(id, dados, opcoes, DR_selecionado) {
                 bordered = TRUE,
                 striped = FALSE,
                 height = 750,
+                rowStyle = function(index) {
+                  if (length(dr_nome_selecionado) > 0 && 
+                      !is.na(dados_t$DR[index]) && 
+                      as.character(dados_t$DR[index]) == dr_nome_selecionado) {
+                    list(backgroundColor = "#ffcccc", fontWeight = "bold")
+                  }
+                },
                 defaultColDef = colDef(format = colFormat(separators = TRUE,
                                                           locales = "pt-BR")),
                 theme = reactableTheme(
