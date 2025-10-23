@@ -86,7 +86,7 @@ div(id = "cabecalho",
                 options = list(dropdownParent = 'body')),
     selectizeInput(
       inputId = "DR",
-      label = textOutput("label_input"),
+      label = Departamento Regional,
       choices = opcoes,
       options = list(dropdownParent = 'body', optgroupField = 'group')
     ),
@@ -108,17 +108,28 @@ uiOutput("PrimeiroSegmento")
 #| label: processa-dados-primeiro-segmento
 #| context: server
 
-output$label_input <- renderText({
-
+observe({
+  req(input$modalidade)
   if(input$modalidade == "0"){
-    saida <- "Departamento Regional"
+opcoes_new <- opcoes
+    updateSelectizeInput(
+      session,
+      "DR",
+      label = "Departamento Regional",
+      choices = opcoes_new
+    )
   } else {
-    saida <- "Departamento Regional - Polo"
+opcoes_new <- opcoes[-6]
+    updateSelectizeInput(
+      session,
+      "DR",
+      label = "Departamento Regional - Polo",
+      choices = opcoes_new
+    )
   }
-  saida
 })
 
-output$PrimeiroSegmento <- renderUI({print(input$unidade)
+output$PrimeiroSegmento <- renderUI({
 
 if(input$unidade != "0" && !is.null(input$unidade)) {
 saida <- card(
@@ -154,7 +165,9 @@ escolhas <- c("Todas" = "0", unidades[grep(input$DR, unidades) ])
 
 DR_selecionado <- reactive({
   req(input$DR)
+  req(!is.null(input$DR))
   input$DR
+
 })
 
 unidade_selecionado <- reactive({
@@ -170,17 +183,17 @@ saida
 
 populacao_filtrada <- reactive({
   req(input$modalidade)
-print( DR_selecionado())
+
   saida <- dados_populacao[[input$modalidade]] %>% 
     filter(DR == DR_selecionado())
-print("Aqui 1")
-print(saida)
+
+
 if(input$modalidade == "0"){
 saida <- saida %>% 
     filter(cod.unidade == unidade_selecionado())
 }
-print("Aqui 2")
-print(saida)
+
+
 saida
 })
 
@@ -393,7 +406,8 @@ caixas_populacao_brasil$server("TerceiroSegmento-Caixas",
 
 tabela$server("TerceiroSegmento-Tabela", 
               dados_brasil_filtrado,
-              opcoes)
+              opcoes,
+              DR_selecionado)
 tabela_unidades$server("TerceiroSegmento-TabelaUnidades", 
                        dados_filtrados_DR,
                        populacao_filtrada_DR)
