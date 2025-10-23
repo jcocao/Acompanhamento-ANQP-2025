@@ -5,7 +5,8 @@ box::use(
   shiny[NS,
         moduleServer,
         textOutput,
-        renderText],
+        renderText, 
+        req],
 )
 
 box::use(
@@ -59,6 +60,7 @@ server <- function(id, dados_filtrado) {
   moduleServer(id, function(input, output, session) {
     
     output$TotalAcessos <- renderText({
+      req(nrow(dados_filtrado()) >= 0)
       saida <- nrow(dados_filtrado())
         
       saida <- formatar_numero(saida)
@@ -67,6 +69,7 @@ server <- function(id, dados_filtrado) {
     })
     
     output$TempoMedio <- renderText({
+      req(nrow(dados_filtrado()) >= 0)
       
       x <- dados_filtrado()
       
@@ -86,6 +89,7 @@ server <- function(id, dados_filtrado) {
     })
     
     output$TempoMediano <- renderText({
+      req(nrow(dados_filtrado()) >= 0)
       
       x <- dados_filtrado()
       if(nrow(x) > 0){

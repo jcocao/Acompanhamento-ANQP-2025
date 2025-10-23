@@ -1,5 +1,5 @@
 box::use(
-  shiny[moduleServer, NS],
+  shiny[moduleServer, NS, req],
   dplyr[tibble, `%>%`, count,
         filter, case_when],
   echarts4r[...],
@@ -18,11 +18,15 @@ ui <- function(id) {
 }
 
 #' @export
-server <- function(id, dados, filtro) {
+server <- function(id, dados, filtro, ano) {
   moduleServer(id, function(input, output, session) {
     
     
     output$grafico_dr_1 <- renderEcharts4r({
+      
+      req(nrow(dados()) >= 0)
+      req(!is.null(filtro()))
+      
       if(length(filtro()) < 1){
         linha <- "."
         check <- F
@@ -104,14 +108,15 @@ server <- function(id, dados, filtro) {
                  itemStyle = list(borderColor =  "rgba(0, 0, 0, 1)",
                                   borderWidth =  0.5),
                  selectedMode = FALSE) %>%
-        e_title(text = "Distribuição dos acessos, por tipo de aparelho utilizado,\nANQP 2024",
+        e_title(text = paste0("Distribuição dos acessos, por tipo de aparelho utilizado,\nANQP ", ano),
                 #subtext = titulo,
                 textStyle = list(fontSize = 18,
                                  fontStyle = "normal")) %>% 
         e_show_loading(text = "Carregando",
                        color = "#8aa8ff",
                        text_color = "#000",
-                       mask_color = "rgba(255, 255, 255, 1)")
+                       mask_color = "rgba(255, 255, 255, 1)") %>% 
+        e_locale("PT-br")
       }
       
       if(nrow(dados_aqui) == 0){
@@ -124,7 +129,7 @@ server <- function(id, dados, filtro) {
           e_legend(show = FALSE) %>%
           e_color("transparent") %>%
           e_labels(position = "inside",
-                   formatter = "DR sem acessos no momento",
+                   formatter = "Sem acessos até o momento",
                    fontSize = 30,
                    color = "black") %>%
           e_x_axis(show = FALSE) %>%

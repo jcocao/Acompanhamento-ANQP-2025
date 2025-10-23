@@ -26,10 +26,12 @@ ui <- function(id) {
 }
 
 #' @export
-server <- function(id, dados, filtro = "AC") {
+server <- function(id, dados, filtro = "AC", ano) {
   moduleServer(id, function(input, output, session) {
     
     output$chart_tempo_1 <- renderEcharts4r({
+      req(nrow(dados()) >= 0)
+      req(!is.null(filtro()))
       
       if(length(filtro()) < 1){
         linha <- "."
@@ -76,7 +78,7 @@ server <- function(id, dados, filtro = "AC") {
         return fmt.format(value);
       }'),
                  axisLabel = list(fontSize = 14)) %>%
-        e_title(text = "Total de acessos por dia, ANQP 2024",
+        e_title(text = paste0("Total de acessos por dia, ANQP ", ano),
                 textStyle = list(fontSize = 18,
                                  fontStyle = "normal"),
                 subtext = titulo, 
@@ -85,7 +87,8 @@ server <- function(id, dados, filtro = "AC") {
         e_show_loading(text = "Carregando",
                        color = "#8F93FF",
                        text_color = "#000",
-                       mask_color = "rgba(255, 255, 255, 1)")
+                       mask_color = "rgba(255, 255, 255, 1)") %>% 
+        e_locale("PT-br")
       }
       
       if(nrow(dados_aqui) == 0){
@@ -98,7 +101,7 @@ server <- function(id, dados, filtro = "AC") {
           e_legend(show = FALSE) %>%
           e_color("transparent") %>%
           e_labels(position = "inside",
-                   formatter = "DR sem acessos no momento",
+                   formatter = "Sem acessos até o momento",
                    fontSize = 30,
                    color = "black") %>%
           e_x_axis(show = FALSE) %>%

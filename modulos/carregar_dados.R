@@ -1,8 +1,6 @@
 box::use(
-  dplyr[`%>%`,
-        as_tibble,
-        mutate,
-        case_when]
+  dplyr[...],
+  purrr[imap]
 )
 
 
@@ -10,12 +8,61 @@ box::use(
 brasil <- readRDS("data/br_uf_shape.Rds")
 
 #' @export
-opcoes <- readRDS("data/opcoes.Rds") %>% c("Brasil" = "BR", .)
+opcoes <- list(Norte = c(Acre = "AC", 
+                         `Amapá` = "AP",
+                         Amazonas = "AM", 
+                         `Pará` = "PA", 
+                         `Rondônia` = "RO",
+                         Roraima = "RR",
+                         Tocantins = "TO"),
+               Nordeste = c(Alagoas = "AL",
+                            Bahia = "BA",
+                            `Ceará` = "CE", 
+                            `Maranhão` = "MA",
+                            `Paraíba` = "PB", 
+                            Pernambuco = "PE",
+                            `Piauí` = "PI",
+                            `Rio Grande do Norte` = "RN", 
+                            Sergipe = "SE"),
+               `Centro-Oeste` = c(`Distrito Federal` = "DF", 
+                                  `Goiás` = "GO", `Mato Grosso` = "MT", `Mato Grosso do Sul` = "MS"
+                ), Sudeste = c(`Espírito Santo` = "ES", `Minas Gerais` = "MG", 
+                               `Rio de Janeiro` = "RJ", `São Paulo` = "SP"), Sul = c(`Paraná` = "PR", 
+                                                                                     `Rio Grande do Sul` = "RS", `Santa Catarina` = "SC"), `Departamento Nacional` = list(
+                                                                                       `Senac Gastronomia` = "SG"))
 
+#' @export
+unidades <- readRDS("data/unidades.Rds")
 #' @export
 dados_populacao <- readRDS("data/dados_p.rds") %>% 
   as_tibble() %>%
-  split(.$ead)
+  split(.$ead) %>% 
+  imap(~{if(.y == 1) .x %>%
+      distinct(DR, ead, pop_a, pop_p) %>%
+      mutate(tx = pop_p/pop_a) else{
+        DR <- .x %>%
+          summarise(cod.unidade = 0,
+                    pop_a = sum(pop_a),
+                    pop_p = sum(pop_p),
+                    .by = c(DR, ead))
+        
+        BR <- DR %>% 
+          summarise(cod.unidade = 0,
+                    pop_a = sum(pop_a),
+                    pop_p = sum(pop_p),
+                    .by = ead) %>%
+          mutate(DR = "BR")
+        
+        .x  %>%
+          bind_rows(DR) %>%
+          bind_rows(BR) %>%
+          mutate(tx = pop_p/pop_a,
+                 cod.unidade = paste(DR,
+                                     cod.unidade,
+                                     sep = "-"))
+        
+      }
+  })
 
 #' @export
 dados_primarios <- readRDS("data/dados.Rds") %>%

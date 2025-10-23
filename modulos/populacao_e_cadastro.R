@@ -26,7 +26,7 @@ ui <-  function(id) {
   ns <- NS(id)
   
   layout_column_wrap(
-    width = "300px",
+    width = "400px",
     value_box(
       title = "População Alvo:",
       value = textOutput(ns("PopulacaoAlvo")),
@@ -67,7 +67,9 @@ server <- function(id, populacao_filtrada) {
     
  
     output$PopulacaoAlvo <- renderText({
+      
       dados <- populacao_filtrada()
+      print(dados)
       req(nrow(dados) > 0)
       dados %>%
         slice(1) %>%

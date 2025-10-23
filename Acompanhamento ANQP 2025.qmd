@@ -1,6 +1,11 @@
 ---
-params:
-  ano: "2025"
+format: 
+  dashboard:
+    scrolling: true
+    lang: pt-br
+    expandable: false
+include-in-header: custom-theme.css
+navbar: false
 server: shiny
 ---
 
@@ -8,6 +13,7 @@ server: shiny
 #| label: definir-tema
 #| message: false
 #| context: setup
+ano <- 2025
 
 knitr::opts_knit$set(root.dir = here::here())
 
@@ -19,7 +25,8 @@ options(box.path = here::here())
 
 box::use(
   dplyr[`%>%`,
-        filter] 
+        filter,
+        mutate] 
 )
 
 ```
@@ -46,24 +53,26 @@ box::use(
   modulos/titulo_do_relatorio[cabecalho],
   modulos/populacao_e_cadastro,
   modulos/caixas_acessos,
+  modulos/caixas_unidades,
   modulos/grafico_taxa,
   modulos/tp_aparelho,
   modulos/caixas_populacao_brasil,
-  modulos/mapa,
-  modulos/tabela
+  modulos/tabela,
+  modulos/tabela_unidades
 )
 
 
 ```
 
 
-## Row {height="9%"}
+## Row {height="5%"}
 
 ```{r}
 #| label: "Titulo do Relatorio"
 ```
-![](images/header.svg){width="100%"}
+![](images/header.svg){width="50%"}
 
+---
 
 ## Row {height="5%"}
 ```{r}
@@ -71,60 +80,111 @@ box::use(
 
 div(id = "cabecalho",
     selectizeInput("modalidade",
-                "Modalidade",
+                "Tipo de ensino",
                 choices = c("Rede Presencial" = "0",
                             "Rede EAD" = "1"),
                 options = list(dropdownParent = 'body')),
     selectizeInput(
       inputId = "DR",
-      label = "Departamento Regional",
+      label = textOutput("label_input"),
       choices = opcoes,
-      options = list(dropdownParent = 'body')
+      options = list(dropdownParent = 'body', optgroupField = 'group')
     ),
-    conditionalPanel(
-  condition = "input.DR != 'Brasil'",
-  selectizeInput(
-    inputId = "unidade",
-    label = "Unidade",
-    choices = "A",
-    options = list(dropdownParent = 'body')
-  )
-)
+    uiOutput("unidade_selecao")
 )
 ```
 
-## Row {height="10%"}
-::: {.card .cartao title="População e cadastro"}
+## Row {height="11%"}
+
 
 ```{r}
 #| label: primeiro-segmento
-populacao_e_cadastro$ui("PrimeiroSegmento")
+uiOutput("PrimeiroSegmento")
 
 ```
 
-:::
 
 ```{r}
 #| label: processa-dados-primeiro-segmento
 #| context: server
+
+output$label_input <- renderText({
+
+  if(input$modalidade == "0"){
+    saida <- "Departamento Regional"
+  } else {
+    saida <- "Departamento Regional - Polo"
+  }
+  saida
+})
+
+output$PrimeiroSegmento <- renderUI({print(input$unidade)
+
+if(input$unidade != "0" && !is.null(input$unidade)) {
+saida <- card(
+card_header("Questionários válidos e Taxa de resposta"),
+caixas_unidades$ui("CaixasUnidades")
+)
+} else {
+saida <- card(
+card_header("População e cadastro"),
+populacao_e_cadastro$ui("CaixasPopulacao")
+)
+}
+saida
+})
+
+caixas_unidades$server("CaixasUnidades", 
+                        dados_filtrado,
+                        populacao_filtrada)
+
+output$unidade_selecao <- renderUI({
+  req(input$modalidade == 0)
+  req(input$DR != "SG")
+
+escolhas <- c("Todas" = "0", unidades[grep(input$DR, unidades) ])
+
+  selectizeInput(
+    inputId = "unidade",
+    label = "Unidade",
+    choices = escolhas,
+    options = list(dropdownParent = 'body', optgroupField = 'group')
+  )
+})
 
 DR_selecionado <- reactive({
   req(input$DR)
   input$DR
 })
 
-populacao_filtrada <- reactive({
-  req(input$modalidade)
-  dados_populacao[[input$modalidade]] %>% 
-dplyr::add_row(ead = unique(.$ead),
-               DR = "BR",
-               pop_a = sum(.$pop_a),
-               pop_p = sum(.$pop_p),
-               tx = sum(.$pop_p) / sum(.$pop_a)) %>% 
-    filter(DR == DR_selecionado())
+unidade_selecionado <- reactive({
+  req(input$unidade)
+if(input$unidade == 0){
+saida <- paste(input$DR, input$unidade, sep = "-")
+} else {
+ saida <- input$unidade
+}
+
+saida
 })
 
-populacao_e_cadastro$server("PrimeiroSegmento", 
+populacao_filtrada <- reactive({
+  req(input$modalidade)
+print( DR_selecionado())
+  saida <- dados_populacao[[input$modalidade]] %>% 
+    filter(DR == DR_selecionado())
+print("Aqui 1")
+print(saida)
+if(input$modalidade == "0"){
+saida <- saida %>% 
+    filter(cod.unidade == unidade_selecionado())
+}
+print("Aqui 2")
+print(saida)
+saida
+})
+
+populacao_e_cadastro$server("CaixasPopulacao", 
                              populacao_filtrada)
 
 
@@ -133,10 +193,31 @@ dados_filtrado <- reactive({
   req(DR_selecionado())
   saida <- dados_primarios[[input$modalidade]]
 
-if(DR_selecionado() == "BR"){
-saida %>% filter(DR == DR_selecionado())}
+if(input$modalidade == "1" & DR_selecionado() != "BR") {
+saida <- saida %>% 
+            filter(DR == DR_selecionado())
+}
 
-saida
+if(input$modalidade == "0") {
+
+if(DR_selecionado() != "BR"){
+saida <- saida %>% 
+            filter(DR == DR_selecionado())
+} else {
+return(saida %>% mutate(Total = total.dr))
+}
+if(input$unidade != 0){
+saida <- saida %>% 
+            filter(cod.unidade == unidade_selecionado()) %>% 
+            mutate(Total = total.unidade)
+} else {
+saida <- saida %>% 
+            mutate(Total = total.dr)
+}
+
+}
+
+return(saida)
 })
 
 
@@ -144,7 +225,7 @@ saida
 
 ```
 
-## Row {height="32%"}
+## Row {height="33%"}
 
 ```{r}
 #| label: segundo-segmento
@@ -183,44 +264,24 @@ caixas_acessos$server("SegundoSegmento-Caixas",
                       dados_filtrado)
 grafico_taxa$server("SegundoSegmento-Acessos",
                     dados_filtrado,
-                    DR_selecionado)
+                    DR_selecionado,
+                    ano)
 
 tp_aparelho$server("SegundoSegmento-TipoDeAparelho",
                    dados_filtrado,
-                   DR_selecionado)
+                   DR_selecionado,
+                   ano) 
 
 ```
 
-## Row {height="44%"}
+## Row {height="46%"}
 
 ```{r}
 #| label: terceiro-segmento
 
-card(
-  card_header("Questionários válidos e Taxa de resposta",
-              ),
-  
-  card_body(layout_columns(
-              col_widths = c(4, 4, 4, 6, 6),
-              !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas")
-              ,
-              card(id = "tabela-terceiro-segmento",
-                card_body(
-                  min_height = "750px",
-                  tabela$ui("TerceiroSegmento-Tabela")
-                )
-              ),
-              
-              card(id = "mapa-terceiro-segmento",
-                card_body(
-                  min_height = "750px",
-                  mapa$ui("TerceiroSegmento-Mapa")
-                )
-                
-              )
-            )
-  )
-)
+uiOutput("TerceiroSegmento")
+
+
 
 ```
 
@@ -230,16 +291,100 @@ card(
 #| label: processa-dados-terceiro-segmento
 #| context: server
 
+output$TerceiroSegmento <- renderUI({
+  if(input$unidade != "0" && !is.null(input$unidade)) {
+saida <- card(
+card_header(paste0("População e cadastro - ", DR_selecionado())),
+populacao_e_cadastro$ui("CaixasPopulacaoDR"))
+
+  } else {
+
+        if(input$modalidade == 0){
+saida <- card(
+    card_header("Questionários válidos e Taxa de resposta",
+    ),
+    
+    card_body(layout_columns(
+        col_widths = c(4, 4, 4, 6,6),
+        !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas"),
+        card(id = "tabela-terceiro-segmento",
+min_width = "400px",
+             card_body(
+                 min_height = "750px",
+                 tabela$ui("TerceiroSegmento-Tabela")
+             )
+        ),
+        card(id = "unidade-terceiro-segmento",
+min_width = "400px",
+             card_body(
+                 min_height = "750px",
+                 #mapa$ui("TerceiroSegmento-Mapa")
+                 tabela_unidades$ui("TerceiroSegmento-TabelaUnidades")
+             )
+             
+        )
+    )
+    )
+)
+        }
+
+if(input$modalidade == 1){
+saida <- card(
+    card_header("Questionários válidos e Taxa de resposta",
+    ),
+    
+    card_body(layout_columns(
+        col_widths = c(4, 4, 4, 12),
+        !!!caixas_populacao_brasil$ui("TerceiroSegmento-Caixas"),
+        card(id = "tabela-terceiro-segmento",
+min_width = "400px",
+             card_body(
+                 min_height = "750px",
+                 tabela$ui("TerceiroSegmento-Tabela")
+             )
+        )
+    )
+    )
+)
+}
+  }
+
+saida
+})
+
+populacao_filtrada_DR <- reactive({
+  req(input$modalidade)
+  req(DR_selecionado())
+
+  saida <- dados_populacao[[input$modalidade]] %>% 
+    filter(DR == DR_selecionado())
+
+saida
+})
+
+dados_filtrados_DR <- reactive({
+  req(input$modalidade)
+  req(DR_selecionado())
+
+  saida <- dados_primarios[[input$modalidade]] %>% 
+    filter(DR == DR_selecionado())
+})
+
+populacao_e_cadastro$server("CaixasPopulacaoDR", 
+                             populacao_filtrada_DR)
+
 dados_brasil_filtrado <- reactive({
   req(input$modalidade)
   req(DR_selecionado())
-  dados_primarios[[input$modalidade]]
+  dados_primarios[[input$modalidade]] %>% 
+mutate(Total = total.dr)
 })
 
 populacao_brasil_filtrado <- reactive({
   req(input$modalidade)
   req(DR_selecionado())
-  dados_populacao[[input$modalidade]]
+  dados_populacao[[input$modalidade]] %>%
+filter(DR == "BR")
 })
 
 caixas_populacao_brasil$server("TerceiroSegmento-Caixas", 
@@ -249,9 +394,12 @@ caixas_populacao_brasil$server("TerceiroSegmento-Caixas",
 tabela$server("TerceiroSegmento-Tabela", 
               dados_brasil_filtrado,
               opcoes)
-mapa$server("TerceiroSegmento-Mapa",
-            brasil,
-            dados_brasil_filtrado)
+tabela_unidades$server("TerceiroSegmento-TabelaUnidades", 
+                       dados_filtrados_DR,
+                       populacao_filtrada_DR)
+# mapa$server("TerceiroSegmento-Mapa",
+#             brasil,
+#             dados_brasil_filtrado)
 
 ```
 

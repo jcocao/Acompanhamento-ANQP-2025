@@ -60,7 +60,6 @@ server <- function(id, dados_brasil_filtrado, populacao_brasil_filtrado) {
     
     
     popbrasil <- reactive({
-      
       saida <- populacao_brasil_filtrado() %>% 
         summarise(pop_a = sum(pop_a, na.rm = T)) %>% 
         pull(pop_a)
@@ -101,7 +100,7 @@ server <- function(id, dados_brasil_filtrado, populacao_brasil_filtrado) {
       
       saida <- formatar_numero(saida, percent = T,
                                digitos = 1, 
-                               ndigitos = 1)
+                               ndigitos = 2)
       
       return(saida)
     })

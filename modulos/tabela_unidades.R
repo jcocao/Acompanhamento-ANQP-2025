@@ -1,46 +1,38 @@
 box::use(
   shiny[moduleServer, NS],
   dplyr[...],
- reactable[...],
+  reactable[...],
 )
 
 
 #' @export
 ui <- function(id) {
   ns <- NS(id)
-      
-      reactableOutput(ns("TblDrEstatisticas"),
-               width = "100%")
-    
-
+  
+  reactableOutput(ns("TblUnidadeEstatisticas"),
+                  width = "100%")
+  
+  
 }
 
 #' @export
-server <- function(id, dados, opcoes, DR_selecionado) {
+server <- function(id, dados, populacao) {
   moduleServer(id, function(input, output, session) {
     
-    output$TblDrEstatisticas <- renderReactable({
-      
-      nomes_ufs <- opcoes |> unname() |> unlist()
-      trad <- data.frame(Nomes = nomes_ufs%>% names,
-                         DR = unname(nomes_ufs),
-                         stringsAsFactors = FALSE)
-      
-      trad <- trad %>% 
-        mutate(Nomes = factor(Nomes))
+    output$TblUnidadeEstatisticas <- renderReactable({
+
+      pop_tratada <- populacao() %>%
+        select(cod.unidade, Alvo = pop_a)
       
       dados_t <- dados() %>%
-        left_join(trad, by = c("DR")) %>%
+        #left_join(trad, by = c("DR")) %>%
         filter(!is.na(valido)) %>% 
-        mutate(DR = Nomes,
-               .keep = "unused") %>% 
-        group_by(DR, ead) %>%
-        filter(DR != "SG") %>%
-        summarise(Validos = sum(valido == "1"),
-                  Total = unique(Total),
-                  Taxa = (Validos/Total))
-     
-                  
+        filter(valido == 1) %>%
+        count(cod.unidade,
+              name = "Validos") %>% 
+        left_join(pop_tratada, by = c("cod.unidade" = "cod.unidade")) %>% 
+        mutate(Taxa = Validos/Alvo)
+      
       
       reactable(dados_t,
                 pagination = FALSE,
@@ -59,14 +51,14 @@ server <- function(id, dados, opcoes, DR_selecionado) {
                     fontWeight = "bold",
                     backgroundColor = "#B1D8B9",
                     fontSize = "18px"
-                                     )
+                  )
                 ),
                 columns = list(
                   ead = colDef(
                     show = FALSE
                   ),
-                  DR = colDef(
-                    name = "Departamento Regional"
+                  cod.unidade = colDef(
+                    name = "Nome da Unidade"
                   ),
                   Validos = colDef(
                     filterable = FALSE,
@@ -76,8 +68,8 @@ server <- function(id, dados, opcoes, DR_selecionado) {
                       fontSize = "16px"
                       
                     )
-                                      ),
-                  Total = colDef(
+                  ),
+                  Alvo = colDef(
                     name = "População Alvo",
                     align = "center"
                   ),
@@ -94,12 +86,12 @@ server <- function(id, dados, opcoes, DR_selecionado) {
                   )
                 )
                 
-                )
-                
+      )
       
-        
+      
+      
     })
     
   })
-  }
-    
+}
+
