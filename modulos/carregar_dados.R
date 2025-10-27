@@ -37,9 +37,15 @@ unidades <- readRDS("data/unidades.Rds")
 dados_populacao <- readRDS("data/dados_p.rds") %>% 
   as_tibble() %>%
   split(.$ead) %>% 
-  imap(~{if(.y == 1) .x %>%
+  imap(~{if(.y == 1){ .x %>%
       distinct(DR, ead, pop_a, pop_p) %>%
-      mutate(tx = pop_p/pop_a) else{
+      mutate(tx = pop_p/pop_a) %>% 
+      add_row(DR = "BR",
+              ead = unique(.$ead),
+              pop_a = sum(.$pop_a, na.rm = T),
+              pop_p = sum(.$pop_p, na.rm = T),
+              tx = sum(.$pop_p, na.rm = T)/sum(.$pop_a, na.rm = T))
+    } else{
         DR <- .x %>%
           summarise(cod.unidade = 0,
                     pop_a = sum(pop_a),

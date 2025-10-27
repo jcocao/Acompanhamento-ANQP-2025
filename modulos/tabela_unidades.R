@@ -16,22 +16,36 @@ ui <- function(id) {
 }
 
 #' @export
-server <- function(id, dados, populacao) {
+server <- function(id, dados, populacao, unidades) {
   moduleServer(id, function(input, output, session) {
     
     output$TblUnidadeEstatisticas <- renderReactable({
 
       pop_tratada <- populacao() %>%
-        select(cod.unidade, Alvo = pop_a)
+        select(cod.unidade,
+               Alvo = pop_a)
+      
+      dr <- populacao()$DR[1]
+      
+      trad <- tibble(
+        cod.unidade = unidades,
+        nomes = names(unidades)
+      ) %>% 
+        filter(stringr::str_detect(cod.unidade, dr))
       
       dados_t <- dados() %>%
-        #left_join(trad, by = c("DR")) %>%
         filter(!is.na(valido)) %>% 
         filter(valido == 1) %>%
         count(cod.unidade,
               name = "Validos") %>% 
-        left_join(pop_tratada, by = c("cod.unidade" = "cod.unidade")) %>% 
-        mutate(Taxa = Validos/Alvo)
+        right_join(trad, by = c("cod.unidade")) %>% 
+        left_join(pop_tratada,
+                  by = c("cod.unidade" = "cod.unidade")) %>% 
+        mutate(Taxa = Validos/Alvo) %>% 
+        select(cod.unidade = nomes,
+               Validos,
+               Alvo,
+               Taxa)
       
       
       reactable(dados_t,
@@ -66,12 +80,13 @@ server <- function(id, dados, populacao) {
                     align = "center",
                     style = list(
                       fontSize = "16px"
-                      
-                    )
+                    ),
+                    na = "0"
                   ),
                   Alvo = colDef(
                     name = "População Alvo",
-                    align = "center"
+                    align = "center",
+                    na = "0"
                   ),
                   Taxa = colDef(
                     name = "Taxa de resposta (%)",
@@ -82,7 +97,8 @@ server <- function(id, dados, populacao) {
                     align = "center",
                     style = list(
                       fontSize = "16px"
-                    )
+                    ),
+                    na = "0"
                   )
                 )
                 

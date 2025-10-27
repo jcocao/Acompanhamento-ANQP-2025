@@ -69,7 +69,7 @@ server <- function(id, populacao_filtrada) {
     output$PopulacaoAlvo <- renderText({
       
       dados <- populacao_filtrada()
-      print(dados)
+      
       req(nrow(dados) > 0)
       dados %>%
         slice(1) %>%

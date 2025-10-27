@@ -22,6 +22,8 @@ library(bslib)
 library(bsicons)
 options(box.path = here::here())
 
+box::use(modulos/importar_base_de_dados)
+
 
 box::use(
   dplyr[`%>%`,
@@ -86,7 +88,7 @@ div(id = "cabecalho",
                 options = list(dropdownParent = 'body')),
     selectizeInput(
       inputId = "DR",
-      label = Departamento Regional,
+      label = "Departamento Regional",
       choices = opcoes,
       options = list(dropdownParent = 'body', optgroupField = 'group')
     ),
@@ -212,6 +214,7 @@ saida <- saida %>%
 }
 
 if(input$modalidade == "0") {
+req(unidade_selecionado())
 
 if(DR_selecionado() != "BR"){
 saida <- saida %>% 
@@ -410,7 +413,8 @@ tabela$server("TerceiroSegmento-Tabela",
               DR_selecionado)
 tabela_unidades$server("TerceiroSegmento-TabelaUnidades", 
                        dados_filtrados_DR,
-                       populacao_filtrada_DR)
+                       populacao_filtrada_DR,
+                       unidades)
 # mapa$server("TerceiroSegmento-Mapa",
 #             brasil,
 #             dados_brasil_filtrado)
