@@ -123,7 +123,7 @@ token <- request("https://pesquisa.senac.br/SphinxAuth/connect/token") %>%
   req_method("POST") %>%
   req_headers(`Content-Type` = "application/x-www-form-urlencoded") %>%
   req_body_raw(paste0("username=senac&token=",
-                      getOption("sphinx_token"),
+                      Sys.getenv("sphinx_token"),
                       "&lang=pt-BR&grant_type=personal_token&client_id=sphinxapiclient")) %>%
   req_perform() %>%
   resp_body_json() %>%
