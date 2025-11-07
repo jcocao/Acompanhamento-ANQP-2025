@@ -67,7 +67,7 @@ server <- function(id, dados_filtrado, populacao_filtrada) {
     })
     
     validos_unidade <- reactive({
-    saida <- dados_filtrado()
+    saida <- dados_filtrado() %>% filter(valido == 1)
     
     saida <- nrow(saida)
     
