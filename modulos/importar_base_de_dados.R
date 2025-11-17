@@ -329,14 +329,6 @@ painel <- pesquisa %>%
          total.unidade,
          total.dr)
 
-
-hora <- Sys.time() %>% format("%d de %B às %H:%M")
-
-
 saveRDS(painel,
         "data/dados.Rds")
-
-
-saveRDS(hora, "data/hora.Rds")
-
 
