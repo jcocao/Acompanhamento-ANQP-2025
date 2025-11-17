@@ -334,7 +334,6 @@ min_width = "400px",
 min_width = "400px",
              card_body(
                  min_height = "750px",
-                 #mapa$ui("TerceiroSegmento-Mapa")
                  tabela_unidades$ui("TerceiroSegmento-TabelaUnidades")
              )
              
@@ -415,9 +414,7 @@ tabela_unidades$server("TerceiroSegmento-TabelaUnidades",
                        dados_filtrados_DR,
                        populacao_filtrada_DR,
                        unidades)
-# mapa$server("TerceiroSegmento-Mapa",
-#             brasil,
-#             dados_brasil_filtrado)
+
 
 ```
 
